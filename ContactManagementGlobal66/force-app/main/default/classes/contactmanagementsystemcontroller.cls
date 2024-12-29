@@ -1,0 +1,54 @@
+public with sharing class contactmanagementsystemcontroller {
+
+    // Create Contact
+    @AuraEnabled
+    public static void cContacts(Contact__c contact) {
+        try {
+            insert contact;
+        } catch (Exception e) {
+            throw new AuraHandledException('Error creating new Contact ' + e.getMessage());
+        }
+    }
+
+    //Update Contact
+    @AuraEnabled
+    public static void uContacts(List<Contact__c> contacts) {
+        try {
+            for (Contact__c c : contacts) {
+                if (String.isEmpty(c.Email__c)) {
+                    throw new AuraHandledException('Email is Required');
+                }
+            }
+            update contacts;
+        } catch (Exception e) {
+            throw new AuraHandledException('Error updating new Contact/s ' + e.getMessage());
+        }
+    }
+
+    //Delete Contact
+    @AuraEnabled
+    public static void dContacts(List<Contact__c> contactsIds) {
+        if (contactsIds == null || contactsIds.isEmpty()) {
+            throw new AuraHandledException('No contact IDs provided');
+        }
+        try {
+            delete [SELECT Id FROM Contact__c WHERE Id IN :contactsIds];
+        } catch (Exception e) {
+            throw new AuraHandledException('Error deleting Contact/s ' + e.getMessage());
+        }
+    }
+
+    //Get Contacts
+    @AuraEnabled (cacheable = false)
+    public static List<Contact__c> rContacts() {
+        try {
+            return [
+                SELECT Id, FirstName__c, LastName__c, Email__c, Phone__c 
+                FROM Contact__c
+                WHERE Email__c != null
+            ];
+        } catch (Exception e) {
+            throw new AuraHandledException('Error retrieving Contact/s ' + e.getMessage());
+        }
+    }
+}

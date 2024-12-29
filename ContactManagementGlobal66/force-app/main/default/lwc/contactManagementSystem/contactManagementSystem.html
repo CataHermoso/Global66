@@ -1,0 +1,25 @@
+<template>
+    <lightning-card title = "Contact Manager Tool" icon-name = "standard:contact">
+        <div class = "slds-p-around_medium">
+            <lightning-input name = "firstName" label = "First Name" type = {text} value = {firstName} onchange = {handleInputChange} lwc:ref="textArea"></lightning-input>
+            <lightning-input name = "lastName" label = "Last Name" type = {text} value = {lastName} onchange = {handleInputChange} lwc:ref="textArea1"></lightning-input>
+            <lightning-input name = "email" label = "Email" type = {email} required value = {email} onchange = {handleInputChange} lwc:ref="textArea2"></lightning-input>
+            <lightning-input name = "phone" label = "Phone" type = {phone} value = {phone} onchange = {handleInputChange} lwc:ref="textArea3"></lightning-input>
+            <lightning-button label = "Create Contact" onclick = {handleAddContact} variant = "brand"></lightning-button>
+        </div> 
+        <template if:true = {isLoading}>
+            <lightning-spinner alternative-tet = "Loading"></lightning-spinner>
+        </template>
+        <template if:false = {isLoading}>
+            <lightning-datatable 
+                key-field = "Id"
+                data = {contacts}
+                columns = {columns}
+                updated-contacts = {updatedContacts}
+                onrowaction = {handleRowAction}
+                >
+            </lightning-datatable>
+            <lightning-button label = "Delete Contacts" onclick = {handleDeleteContacts} variant = "destructive"></lightning-button>
+        </template>
+    </lightning-card>
+</template>
