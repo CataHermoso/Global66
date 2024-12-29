@@ -1,38 +1,57 @@
 public with sharing class ContactManagementSystemController {
+
+    // Create Contact
+    @AuraEnabled
     private static void cContacts(List<Contacto> contacts) {
-        for (Contact c : contacts) {
-            if (c.Email != null) {
-                insert c;
-            } else {
-                System.addError('Email is required');
+        try {
+            for (Contact c : contacts) {
+                if (String.isEmpty(c.Email)) {
+                    throw new AuraHandledException('Email is Required');
+                }
             }
+            insert contacts;
+        } catch (Exception e) {
+            throw new AuraHandledException('Error creating new Contact/s');
         }
     }
 
+    //Update Contact
+    @AuraEnabled
     private static void uContacts(List<Contact> contacts) {
-        for (Contact c : contacts) {
-            if (c.Email != null) {
-                update c;
-            } else {
-                System.addError('Email is required');
+        try {
+            for (Contact c : contacts) {
+                if (String.isEmpty(c.Email)) {
+                    throw new AuraHandledException('Email is Required ' + e.getMessage());
+                }
             }
+            update contacts;
+        } catch (Exception e) {
+            throw new AuraHandledException('Error updating new Contact/s ' + e.getMessage());
         }
     }
 
-    private static void dContacts(List<Contacto> contacts) {
-        for (Contact c : contacts) {
-            delete c;
+    //Delete Contact
+    @AuraEnabled
+    private static void dContacts(List<Contacto> contactsIds) {
+        try {
+            List<Contact__c> contactsToDelete = [SELECT Id FROM Contact__c WHERE Id IN :contactsIds]
+            delete contactsToDelete;
+        } catch (Exception e) {
+            throw new AuraHandledException('Error deleting Contact/s ' + e.getMessage());
         }
     }
 
+    //Get Contacts
+    @AuraEnabled (cacheable=true)
     private static List<Contact> rContacts() {
-        List<Contact> contacts = [SELECT Id, FirstName, LastName, Email, Phone FROM Contact__c];
-        List<Contact> result = new List<Contact>();
-        for (Contact c : contacts) {
-            if(c.Email <> null) {
-                results.add(c);
-            }
+        try {
+            return [
+                SELECT Id, FirstName__c, LastName__c, Email__c, Phone__c 
+                FROM Contact__c
+                WHERE Emil__c != null
+            ];
+        } catch (Exception e) {
+            throw new AuraHandledException('Error retrieving Contact/s ' + e.getMessage());
         }
-        // return result;
     }
 }

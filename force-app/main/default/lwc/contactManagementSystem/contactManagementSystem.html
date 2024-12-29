@@ -11,7 +11,13 @@
             key-field = "Id"
             data = {contacts}
             columns = {columns}
-            onrowaction = {handleRowAction}>
+            updated-contacts = {updatedContacts}
+            onrowaction = {handleRowAction}
+            >
         </lightning-datatable>
+
+        <template if:true = {isLoading}>
+            <lightning-spinner alternative-tet = "Loading"></lightning-spinner>
+        </template>
     </lighting-card>
 </template>
