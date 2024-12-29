@@ -2,16 +2,11 @@ public with sharing class contactmanagementsystemcontroller {
 
     // Create Contact
     @AuraEnabled
-    public static void cContacts(List<Contact__c> contacts) {
+    public static void cContacts(Contact__c contact) {
         try {
-            for (Contact__c c : contacts) {
-                if (String.isEmpty(c.Email__c)) {
-                    throw new AuraHandledException('Email is Required');
-                }
-            }
-            insert contacts;
+            insert contact;
         } catch (Exception e) {
-            throw new AuraHandledException('Error creating new Contact/s');
+            throw new AuraHandledException('Error creating new Contact ' + e.getMessage());
         }
     }
 
@@ -33,16 +28,18 @@ public with sharing class contactmanagementsystemcontroller {
     //Delete Contact
     @AuraEnabled
     public static void dContacts(List<Contact__c> contactsIds) {
+        if (contactsIds == null || contactsIds.isEmpty()) {
+            throw new AuraHandledException('No contact IDs provided');
+        }
         try {
-            List<Contact__c> contactsToDelete = [SELECT Id FROM Contact__c WHERE Id IN :contactsIds];
-            delete contactsToDelete;
+            delete [SELECT Id FROM Contact__c WHERE Id IN :contactsIds];
         } catch (Exception e) {
             throw new AuraHandledException('Error deleting Contact/s ' + e.getMessage());
         }
     }
 
     //Get Contacts
-    @AuraEnabled (cacheable=true)
+    @AuraEnabled (cacheable = false)
     public static List<Contact__c> rContacts() {
         try {
             return [
