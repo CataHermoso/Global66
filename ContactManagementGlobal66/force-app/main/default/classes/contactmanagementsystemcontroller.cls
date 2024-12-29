@@ -48,7 +48,7 @@ public with sharing class ContactManagementSystemController {
             return [
                 SELECT Id, FirstName__c, LastName__c, Email__c, Phone__c 
                 FROM Contact__c
-                WHERE Emil__c != null
+                WHERE Email__c != null
             ];
         } catch (Exception e) {
             throw new AuraHandledException('Error retrieving Contact/s ' + e.getMessage());
