@@ -1,11 +1,11 @@
-public with sharing class ContactManagementSystemController {
+public with sharing class contactmanagementsystemcontroller {
 
     // Create Contact
     @AuraEnabled
-    private static void cContacts(List<Contacto> contacts) {
+    public static void cContacts(List<Contact__c> contacts) {
         try {
-            for (Contact c : contacts) {
-                if (String.isEmpty(c.Email)) {
+            for (Contact__c c : contacts) {
+                if (String.isEmpty(c.Email__c)) {
                     throw new AuraHandledException('Email is Required');
                 }
             }
@@ -17,11 +17,11 @@ public with sharing class ContactManagementSystemController {
 
     //Update Contact
     @AuraEnabled
-    private static void uContacts(List<Contact> contacts) {
+    public static void uContacts(List<Contact__c> contacts) {
         try {
-            for (Contact c : contacts) {
-                if (String.isEmpty(c.Email)) {
-                    throw new AuraHandledException('Email is Required ' + e.getMessage());
+            for (Contact__c c : contacts) {
+                if (String.isEmpty(c.Email__c)) {
+                    throw new AuraHandledException('Email is Required');
                 }
             }
             update contacts;
@@ -32,9 +32,9 @@ public with sharing class ContactManagementSystemController {
 
     //Delete Contact
     @AuraEnabled
-    private static void dContacts(List<Contacto> contactsIds) {
+    public static void dContacts(List<Contact__c> contactsIds) {
         try {
-            List<Contact__c> contactsToDelete = [SELECT Id FROM Contact__c WHERE Id IN :contactsIds]
+            List<Contact__c> contactsToDelete = [SELECT Id FROM Contact__c WHERE Id IN :contactsIds];
             delete contactsToDelete;
         } catch (Exception e) {
             throw new AuraHandledException('Error deleting Contact/s ' + e.getMessage());
@@ -43,7 +43,7 @@ public with sharing class ContactManagementSystemController {
 
     //Get Contacts
     @AuraEnabled (cacheable=true)
-    private static List<Contact> rContacts() {
+    public static List<Contact__c> rContacts() {
         try {
             return [
                 SELECT Id, FirstName__c, LastName__c, Email__c, Phone__c 

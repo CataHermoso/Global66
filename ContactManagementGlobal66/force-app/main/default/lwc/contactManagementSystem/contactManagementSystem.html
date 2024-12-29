@@ -1,10 +1,10 @@
 <template>
-    <lighting-card title = "Contact Manager Tool" icon-name = "standard:contact">
+    <lightning-card title = "Contact Manager Tool" icon-name = "standard:contact">
         <div class = "slds-p-around_medium">
-            <lightning-input label = "Name" value = {firstName} onchange = "{handleInputChange}"></lightning-input>
-            <lightning-input label = "Last Name" value = {lastName} onchange = "{handleInputChange}"></lightning-input>
-            <lightning-input type = "email" label = "Email" required value = {email} onchange = "{handleInputChange}"></lightning-input>
-            <lightning-input label = "Phone" value = {phone} onchange = "{handleInputChange}"></lightning-input>
+            <lightning-input label = "Name" value = {FirstName__c} onchange = "{handleInputChange}"></lightning-input>
+            <lightning-input label = "Last Name" value = {LastName__c} onchange = "{handleInputChange}"></lightning-input>
+            <lightning-input type = "email" label = "Email" required value = {Email__c} onchange = "{handleInputChange}"></lightning-input>
+            <lightning-input label = "Phone" value = {Phone__c} onchange = "{handleInputChange}"></lightning-input>
             <lightning-input label = "Add Contact/s" onchange = "{handleAddContact}"></lightning-input>
         </div> 
         <lightning-datatable 
@@ -19,5 +19,5 @@
         <template if:true = {isLoading}>
             <lightning-spinner alternative-tet = "Loading"></lightning-spinner>
         </template>
-    </lighting-card>
+    </lightning-card>
 </template>
