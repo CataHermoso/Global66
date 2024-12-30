@@ -4,6 +4,7 @@ import fetchContacts from '@salesforce/apex/contactmanagementsystemcontroller.rC
 import createContact from '@salesforce/apex/contactmanagementsystemcontroller.cContacts';
 import deleteContacts from '@salesforce/apex/contactmanagementsystemcontroller.dContacts';
 import updateContacts from '@salesforce/apex/contactmanagementsystemcontroller.uContacts';
+import searchContacts from '@salesforce/apex/contactmanagementsystemcontroller.sContacts';
 
 export default class contactManagementSystem extends LightningElement {
     contact = {
@@ -19,6 +20,7 @@ export default class contactManagementSystem extends LightningElement {
     lastName = '';
     email = '';
     phone = '';
+    @track searchKey = '';
     columns = [
         { label: 'First Name', fieldName: 'FirstName__c', type: 'text', editable: true },
         { label: 'Last Name', fieldName: 'LastName__c', type: 'text', editable: true },
@@ -110,7 +112,6 @@ export default class contactManagementSystem extends LightningElement {
             this.showToast('Error', 'Invalid selection', 'error');
             return;
         }
-        console.log('Deleting contact with ID:', this.selectedRows); 
         this.isLoading = true;
         
         deleteContacts({ contactIds: this.selectedRows })
@@ -161,6 +162,29 @@ export default class contactManagementSystem extends LightningElement {
                 this.isLoading = false;
             });
     }
+
+    handleSearchContacts(event) {
+        this.searchKey = event.target.value; 
+        console.log('Search key updated to: ', this.searchKey);
+    }
+
+    fetchSearchResults() {
+        this.isLoading = true;
+        console.log('Starting fetchSearchResults with searchKey: ', this.searchKey);
+        searchContacts({ searchKey: this.searchKey })
+            .then(result => {
+                this.contacts = result;
+                console.log('Fetched contacts: ', result);
+            })
+            .catch(error => {
+                console.error('Error in fetching contacts: ', error);
+                this.showToast('Error', 'No records found', 'error');
+            })
+            .finally(() => {
+                this.isLoading = false;
+            });
+    }
+    
 
     showToast(title, message, variant) {
         const event = new ShowToastEvent({

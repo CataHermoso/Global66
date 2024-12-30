@@ -47,26 +47,19 @@ public with sharing class contactmanagementsystemcontroller {
         }
     }
 
-    //search contacts
-    @AuraEnabled(cacheable=true)
-    public static List<Contact__c> getContactList(string searchKey) {
-        string searchKeyword = '%' + searchKey + '%';
-		
-       // contact list to store search result 
-    List<Contact__c> contactListRecord = new List<Contact__c>();
-     
-	   // query contact records
-        for(Contact__c contactSearched : [
-            SELECT Id, FirstName__c, LastName__c, Email__c, Phone__c 
-            FROM Contact__c
-            WHERE name LIKE : searchKeyword]){
-            contactListRecord.add(contactSearched);
+    /*search contacts
+    @AuraEnabled
+    public static List<Contact__c> sContacts (string searchKey) {
+        if (String.isBlank(searchKey)) {
+            return new List<Contact__c>();
         }
-        
-         if(contactListRecord.size() == 0){
-            throw new AuraHandledException('No Record Found..'); 
-         }
-         
-        return contactListRecord;
-    }
+        String searchKeyWithWildcards = '%' + searchKey + '%';
+        return [
+            SELECT Id, FirstName__c, LastName__c, Email__c, Phone__c
+            FROM Contact__c 
+            WHERE FirstName__c LIKE :searchKeyWithWildcards 
+            OR LastName__c LIKE :searchKeyWithWildcards
+            LIMIT 7
+            ];
+    }*/
 }
