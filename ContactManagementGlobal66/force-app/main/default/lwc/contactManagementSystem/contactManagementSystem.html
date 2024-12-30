@@ -1,25 +1,97 @@
 <template>
-    <lightning-card title = "Contact Manager Tool" icon-name = "standard:contact">
-        <div class = "slds-p-around_medium">
-            <lightning-input name = "firstName" label = "First Name" type = {text} value = {firstName} onchange = {handleInputChange} lwc:ref="textArea"></lightning-input>
-            <lightning-input name = "lastName" label = "Last Name" type = {text} value = {lastName} onchange = {handleInputChange} lwc:ref="textArea1"></lightning-input>
-            <lightning-input name = "email" label = "Email" type = {email} required value = {email} onchange = {handleInputChange} lwc:ref="textArea2"></lightning-input>
-            <lightning-input name = "phone" label = "Phone" type = {phone} value = {phone} onchange = {handleInputChange} lwc:ref="textArea3"></lightning-input>
-            <lightning-button label = "Create Contact" onclick = {handleAddContact} variant = "brand"></lightning-button>
+    <lightning-card title="Contact Manager Tool" icon-name="standard:contact">
+        <div class="slds-p-around_medium">
+            <lightning-input name="firstName" label="First Name" type="text" value={firstName} onchange={handleInputChange} lwc:ref="textArea"></lightning-input>
+            <lightning-input name="lastName" label="Last Name" type="text" value={lastName} onchange={handleInputChange} lwc:ref="textArea"></lightning-input>
+            <lightning-input name="email" label="Email" type="email" required value={email} onchange={handleInputChange} lwc:ref="textArea"></lightning-input>
+            <lightning-input name="phone" label="Phone" type="phone" value={phone} onchange={handleInputChange} lwc:ref="textArea"></lightning-input>
         </div> 
-        <template if:true = {isLoading}>
-            <lightning-spinner alternative-tet = "Loading"></lightning-spinner>
+        <div class="button-container">
+            <lightning-button 
+                label="Create Contact" 
+                onclick={handleAddContact} 
+                variant="brand">
+            </lightning-button>
+        </div>
+        <br>
+        <div class="slds-m-bottom_small">
+            <lightning-input type="text"
+               value={searchValue}
+               label="Contact Name"
+               onchange={searchKeyword}
+               >
+            </lightning-input>
+        </div>
+        <br>
+        <lightning-button label="Search"
+            onclick={handleSearchKeyword}
+            variant="brand"></lightning-button>
+        <br>
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-m-top_small">
+            <thead>
+               <tr class="slds-line-height_reset">
+                  <th class="" scope="col">
+                     <div class="slds-truncate" title="First Name">First Name</div>
+                  </th>
+                  <th class="" scope="col">
+                     <div class="slds-truncate" title="Last Name">Last Name</div>
+                  </th>
+                  <th class="" scope="col">
+                     <div class="slds-truncate" title="Phone">Phone</div>
+                  </th>
+                  <th class="" scope="col">
+                     <div class="slds-truncate" title="Email">Email</div>
+                  </th>
+               </tr>
+            </thead>
+            
+            <tbody>   
+               <template for:each={contacts} for:item="con">
+                  <tr class="slds-hint-parent" key={contact.Id}>
+                     <td>
+                        <div class="slds-truncate">{con.FirstName}</div>
+                     </td>
+                     <td>
+                        <div class="slds-truncate">{con.LastName}</div>
+                     </td>
+                     <td>
+                        <div class="slds-truncate">
+                           <lightning-formatted-phone value={con.Phone} ></lightning-formatted-phone>
+                        </div>
+                     </td>
+                     <td>
+                        <div class="slds-truncate">
+                           <lightning-formatted-email value={con.Email} ></lightning-formatted-email>
+                        </div>
+                     </td>
+                  </tr>
+               </template>
+            </tbody>
+         </table>
+         <br>
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-tet="Loading"></lightning-spinner>
         </template>
-        <template if:false = {isLoading}>
+        <template if:false={isLoading}>
             <lightning-datatable 
-                key-field = "Id"
-                data = {contacts}
-                columns = {columns}
-                updated-contacts = {updatedContacts}
-                onrowaction = {handleRowAction}
+                key-field="Id"
+                data={contacts}
+                columns={columns}
+                selected-rows={selectedRows}
+                onrowselection={handleRowSelection}
+                draft-values={draftValues} 
+                hide-checkbox-column={isEditing}
+                onsave={handleSaveContacts}
                 >
             </lightning-datatable>
-            <lightning-button label = "Delete Contacts" onclick = {handleDeleteContacts} variant = "destructive"></lightning-button>
+            <br>
+            <div class="button-container">
+                <lightning-button 
+                    label="Delete Contacts" 
+                    onclick={handleDeleteContacts} 
+                    variant="destructive">
+                </lightning-button>
+            </div>
         </template>
     </lightning-card>
 </template>

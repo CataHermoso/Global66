@@ -14,11 +14,6 @@ public with sharing class contactmanagementsystemcontroller {
     @AuraEnabled
     public static void uContacts(List<Contact__c> contacts) {
         try {
-            for (Contact__c c : contacts) {
-                if (String.isEmpty(c.Email__c)) {
-                    throw new AuraHandledException('Email is Required');
-                }
-            }
             update contacts;
         } catch (Exception e) {
             throw new AuraHandledException('Error updating new Contact/s ' + e.getMessage());
@@ -27,12 +22,12 @@ public with sharing class contactmanagementsystemcontroller {
 
     //Delete Contact
     @AuraEnabled
-    public static void dContacts(List<Contact__c> contactsIds) {
-        if (contactsIds == null || contactsIds.isEmpty()) {
+    public static void dContacts(List<Id> contactIds) {
+        if (contactIds == null || contactIds.isEmpty()) {
             throw new AuraHandledException('No contact IDs provided');
         }
         try {
-            delete [SELECT Id FROM Contact__c WHERE Id IN :contactsIds];
+            delete [SELECT Id FROM Contact__c WHERE Id IN :contactIds];
         } catch (Exception e) {
             throw new AuraHandledException('Error deleting Contact/s ' + e.getMessage());
         }
@@ -50,5 +45,28 @@ public with sharing class contactmanagementsystemcontroller {
         } catch (Exception e) {
             throw new AuraHandledException('Error retrieving Contact/s ' + e.getMessage());
         }
+    }
+
+    //search contacts
+    @AuraEnabled(cacheable=true)
+    public static List<Contact__c> getContactList(string searchKey) {
+        string searchKeyword = '%' + searchKey + '%';
+		
+       // contact list to store search result 
+    List<Contact__c> contactListRecord = new List<Contact__c>();
+     
+	   // query contact records
+        for(Contact__c contactSearched : [
+            SELECT Id, FirstName__c, LastName__c, Email__c, Phone__c 
+            FROM Contact__c
+            WHERE name LIKE : searchKeyword]){
+            contactListRecord.add(contactSearched);
+        }
+        
+         if(contactListRecord.size() == 0){
+            throw new AuraHandledException('No Record Found..'); 
+         }
+         
+        return contactListRecord;
     }
 }

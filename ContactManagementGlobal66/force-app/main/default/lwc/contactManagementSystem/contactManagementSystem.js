@@ -6,32 +6,33 @@ import deleteContacts from '@salesforce/apex/contactmanagementsystemcontroller.d
 import updateContacts from '@salesforce/apex/contactmanagementsystemcontroller.uContacts';
 
 export default class contactManagementSystem extends LightningElement {
-    @track contact = {
+    contact = {
         FirstName__c: '',
          LastName__c: '',
          Email__c: '',
          Phone__c: ''
     };
     @track contacts = []; //stores list of fetched contacts
-    selectedContactIds = [];
-    @track updatedContacts = []; // tracks the updated values in the table
-    @track firstName = '';
-    @track lastName = '';
-    @track email = '';
-    @track phone = '';
-    @track isLoading = false;
-
+    selectedRows = [];
+    @track draftValues = []; // tracks the updated values in the table
+    firstName = '';
+    lastName = '';
+    email = '';
+    phone = '';
     columns = [
         { label: 'First Name', fieldName: 'FirstName__c', type: 'text', editable: true },
         { label: 'Last Name', fieldName: 'LastName__c', type: 'text', editable: true },
         { label: 'Email', fieldName: 'Email__c', type: 'email', editable: true },
         { label: 'Phone', fieldName: 'Phone__c', type: 'phone', editable: true }
     ];
+    @track isEditing = false;
+    isLoading = false;
 
-    handleFetchContacts() {
+    connectedCallback() {
+        this.handleFetchContacts();
+    }
 
-        this.isLoading = true;
-        
+    handleFetchContacts() {        
         fetchContacts(  )
             .then((result) => {
                 this.contacts = result;
@@ -43,35 +44,7 @@ export default class contactManagementSystem extends LightningElement {
                 this.isLoading = false;
             });
     }
-
-    connectedCallback() {
-        this.handleFetchContacts();
-    }
-
-    /*updating contacts
-    handleSave(event) {
-        if (!this.email) {
-            this.showToast('Error', 'Email is required', 'error');
-            return;
-        }
-
-        this.updatedContacts = event.detail.updatedContacts;
-
-        updateContacts ({ contacts: this.updatedContacts })
-            .then(() => {
-                this.updatedContacts = [];
-                this.handleFetchContacts();
-                this.showToast('Success', 'Contact updated successfully', 'success');
-            })
-            .catch((error) => {
-                console.error('Contact not updated: ', error);
-                this.showToast('Error', 'Contact could not be updated successfully', 'error');
-            })
-            .finally(() => {
-                this.isLoading = false;
-            });
-    }*/
-
+    
     handleInputChange(event) {
         const field = event.target.name;
         this[field] = event.target.value;
@@ -83,14 +56,12 @@ export default class contactManagementSystem extends LightningElement {
             this.showToast('Error', 'Email is required', 'error');
             return;
         }
-
         const newContact = {
             FirstName__c: this.firstName,
             LastName__c: this.lastName,
             Email__c: this.email,
             Phone__c: this.phone
         };
-
         this.isLoading = true;
 
         createContact({ contact: newContact })
@@ -110,51 +81,81 @@ export default class contactManagementSystem extends LightningElement {
 
     //clearing all form fields
     clearForm() {
-        this.refs.textArea.value = '';
-        this.refs.textArea1.value = '';
-        this.refs.textArea2.value = '';
-        this.refs.textArea3.value = '';
-    }
- 
-    handleRowAction(event) {
-        const actionName = event.detail.action.name;
-        const selectedRows = event.detail.selectedRows;
-        console.log('Row data:', selectedRow);
-
-        if (selectedRows && selectedRows.length > 0) {
-            this.selectedContactIds = selectedRows.map(row => row.Id);  
-            console.log('Selected Contact IDs:', this.selectedContactIds); 
-        } else {
-            this.selectedContactIds = []; 
-            console.log('No rows selected.');
-        }
-
-        if (actionName === 'delete' && this.selectedContactIds.length > 0) {
-            this.handleDeleteContacts()
-        } else if (actionName === 'delete'){
-            this.showToast('Error', 'No contac/s were selected for deletion', 'error')
+        this.template.querySelectorAll('lightning-input').forEach(input => (input.value = ''));
+        this.firstName = '';
+        this.lastName = '';
+        this.email = '';
+        this.phone = '';
+    }   
+    
+    handleRowSelection(event) {
+        try {
+            const selectedRows = event.detail.selectedRows;
+            console.log('Selected Rows:', selectedRows);
+            this.selectedRows = selectedRows ? selectedRows.map(row => row.Id) : [];
+            console.log('Selected Row IDs:', this.selectedRows);
+        } catch (error) {
+            console.error('Error in handleRowSelection:', error);
         }
     }
-
+    
     //deleting contacts
-    handleDeleteContacts(contactId) {
-        console.log('Deleting contact with ID:', contactId);
-        if (this.selectedContactIds.length === 0) {
-            this.showToast('Error', 'No Contact/s selected for deletion', 'error');
+    handleDeleteContacts(contactIds) {
+        if (!this.selectedRows || this.selectedRows.length === 0) {
+            this.showToast('Error', 'No contacts selected for deletion', 'error');
             return;
-        }        
-        
+        }
+        contactIds = Array.isArray(this.selectedRows) ? this.selectedRows : [this.selectedRows];
+        if (!Array.isArray(this.selectedRows) || this.selectedRows.length === 0) {
+            this.showToast('Error', 'Invalid selection', 'error');
+            return;
+        }
+        console.log('Deleting contact with ID:', this.selectedRows); 
         this.isLoading = true;
         
-        deleteContacts({ contactsIds: [this.selectedContactIds] })
-            .then((result) => {
-                this.contacts = this.contacts.filter(contact => !this.selectedContactIds.includes(contact.Id));
+        deleteContacts({ contactIds: this.selectedRows })
+            .then(() => {
+                this.contacts = this.contacts.filter(contact => !contactIds.includes(contact.Id));
+                this.selectedRows = [];
                 this.showToast('Success', 'Contact deleted successfully', 'success');
                 this.handleFetchContacts();
             })
             .catch((error) => {
                 console.error('Error al eliminar contacto: ', error);
                 this.showToast('Error', 'Contact could not be deleted successfully', 'error');
+            })
+            .finally(() => {
+                this.isLoading = false;
+            });
+    }
+
+    //updating contacts
+    handleSaveContacts(event) {
+        const updatedContacts = event.detail.draftValues;
+        const contactsToUpdate = updatedContacts.map(draft => {
+            const originalRecord = this.contacts.find(contact => contact.Id === draft.Id);
+            return { ...originalRecord, ...draft }; // Merge original and draft value s
+        });
+        if (!updatedContacts || updatedContacts.length === 0) {
+            this.showToast('Error', 'No changes to save', 'error');
+            return;
+        }
+        const invalidContact = contactsToUpdate.find(contact => !contact.Email__c);
+        if (invalidContact) {
+            this.showToast('Error', 'Email is required', 'error');
+            return;
+        }
+
+        updateContacts ({ contacts: contactsToUpdate })
+            .then(() => {
+                this.showToast('Success', 'Contact updated successfully', 'success');
+                this.draftValues = [];
+                this.isEditing = false;
+                this.handleFetchContacts();
+            })
+            .catch((error) => {
+                console.error('Contact/s not updated: ', error);
+                this.showToast('Error', 'Contact/s could not be updated successfully', 'error');
             })
             .finally(() => {
                 this.isLoading = false;
