@@ -1,18 +1,29 @@
-# Salesforce DX Project: Next Steps
+***Guía de Configuración y Ejecución del Proyecto: Sistema de Gestión de Contactos***
+-------------------------------------------------------------------------------
+**Descripción del Proyecto**
+Este proyecto es una herramienta para la gestión de contactos en Salesforce, que permite crear, actualizar, eliminar y buscar contactos. La interfaz de usuario se construye utilizando un Lightning Web Component (LWC), mientras que la lógica de negocio se maneja en Apex.
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+**Credenciales para Iniciar Sesion**
+- URL: https://global664-dev-ed.develop.lightning.force.com/
+- UserName: pruebaglobal66@salesforce.com
+- Contraseña: Global66
 
-## How Do You Plan to Deploy Your Changes?
+**Ejecución del Proyecto**
+Una vez loggeado a la organizacion, si no te encuentras en la app de Sales puedes navegar a ella clickeando en el App Launcher. Una vez alli, navega a la segunda tab con el nombre de "Contact Management" donde se encuentra el LWC creado y a su derecha una List View Standard de contactos.
+Desde la interfaz, puedes: 
+- Crear contactos con los campos FirstName, LastName, Email (Requerido) y Phone.
+- Ver los contactos existentes.
+- Actualizar los datos de los contactos.
+- Eliminar contactos seleccionados.
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+**Pruebas**
+El proyecto incluye pruebas unitarias en Apex para validar las operaciones de creación, actualización, eliminación y recuperación de contactos.
 
-## Configure Your Salesforce DX Project
+**Elecciones de Diseño**
+- Uso de Apex y LWC: Opté por separar la lógica de negocio en Apex para asegurarme de que las operaciones de base de datos estuvieran bien gestionadas y controladas, pasando los parametros necesarios para que el componente LWC tenga buena respuesta.
+- Manejo de Excepciones: He utilizado AuraHandledException para poder tener mensajes de error claros al momento de debuggear y mensajes Toast para manejar errores específicos y garantizar que el usuario reciba mensajes claros y comprensibles.
+- Interactividad: Se implementaron funcionalidades como la selección de filas en una tabla para facilitar la eliminación de contactos. También se añadió un filtro de búsqueda para mejorar la experiencia del usuario al gestionar contactos.
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
-
-## Read All About It
-
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+**Clonacion de Proyecto**
+- URL Repo: https://github.com/CataHermoso/Global66
+- URL GitHub: https://github.com/CataHermoso
