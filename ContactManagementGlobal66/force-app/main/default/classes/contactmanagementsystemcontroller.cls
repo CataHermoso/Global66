@@ -23,9 +23,6 @@ public with sharing class contactmanagementsystemcontroller {
     //Delete Contact
     @AuraEnabled
     public static void dContacts(List<Id> contactIds) {
-        if (contactIds == null || contactIds.isEmpty()) {
-            throw new AuraHandledException('No contact IDs provided');
-        }
         try {
             delete [SELECT Id FROM Contact__c WHERE Id IN :contactIds];
         } catch (Exception e) {
@@ -50,16 +47,22 @@ public with sharing class contactmanagementsystemcontroller {
     /*search contacts
     @AuraEnabled
     public static List<Contact__c> sContacts (string searchKey) {
-        if (String.isBlank(searchKey)) {
+        
+        try { 
+            if (String.isBlank(searchKey)) {
             return new List<Contact__c>();
+            }
+            String searchKeyWithWildcards = '%' + searchKey + '%';
+            return [
+                SELECT Id, FirstName__c, LastName__c, Email__c, Phone__c
+                FROM Contact__c 
+                WHERE FirstName__c LIKE :searchKeyWithWildcards 
+                OR LastName__c LIKE :searchKeyWithWildcards
+                LIMIT 3
+                ];
+        } catch (Exception e) {
+        	throw new AuraHandledException('Error searching for contacts: ' + e.getMessage());
+
         }
-        String searchKeyWithWildcards = '%' + searchKey + '%';
-        return [
-            SELECT Id, FirstName__c, LastName__c, Email__c, Phone__c
-            FROM Contact__c 
-            WHERE FirstName__c LIKE :searchKeyWithWildcards 
-            OR LastName__c LIKE :searchKeyWithWildcards
-            LIMIT 7
-            ];
     }*/
 }
