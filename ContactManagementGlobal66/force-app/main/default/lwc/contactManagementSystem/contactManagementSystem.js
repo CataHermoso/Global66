@@ -51,19 +51,6 @@ export default class contactManagementSystem extends LightningElement {
     handleInputChange(event) {
         const field = event.target.name;
         this[field] = event.target.value;
-
-        if (field === 'phone') {
-            this.validatePhoneNumber(this.phone);
-        }
-    }
-
-    validatePhoneNumber(phone) {
-        const phoneRegex = /^[0-9]{10}$/; 
-        if (!phoneRegex.test(phone)) {
-            this.phoneError = 'Please enter a valid 10 digit phone number.';
-        } else {
-            this.phoneError = ''; 
-        }
     }
 
     //creating a contact
