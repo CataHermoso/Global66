@@ -166,7 +166,7 @@ export default class contactManagementSystem extends LightningElement {
             );
         } else {
             this.filteredContacts = [...this.contacts];
-        }
+        } 
     }
 
     showToast(title, message, variant) {
