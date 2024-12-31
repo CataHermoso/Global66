@@ -43,26 +43,4 @@ public with sharing class contactmanagementsystemcontroller {
             throw new AuraHandledException('Error retrieving Contact/s ' + e.getMessage());
         }
     }
-
-    /*search contacts
-    @AuraEnabled
-    public static List<Contact__c> sContacts (string searchKey) {
-        
-        try { 
-            if (String.isBlank(searchKey)) {
-            return new List<Contact__c>();
-            }
-            String searchKeyWithWildcards = '%' + searchKey + '%';
-            return [
-                SELECT Id, FirstName__c, LastName__c, Email__c, Phone__c
-                FROM Contact__c 
-                WHERE FirstName__c LIKE :searchKeyWithWildcards 
-                OR LastName__c LIKE :searchKeyWithWildcards
-                LIMIT 3
-                ];
-        } catch (Exception e) {
-        	throw new AuraHandledException('Error searching for contacts: ' + e.getMessage());
-
-        }
-    }*/
 }

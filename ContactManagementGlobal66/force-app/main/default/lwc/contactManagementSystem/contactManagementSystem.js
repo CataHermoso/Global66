@@ -4,7 +4,6 @@ import fetchContacts from '@salesforce/apex/contactmanagementsystemcontroller.rC
 import createContact from '@salesforce/apex/contactmanagementsystemcontroller.cContacts';
 import deleteContacts from '@salesforce/apex/contactmanagementsystemcontroller.dContacts';
 import updateContacts from '@salesforce/apex/contactmanagementsystemcontroller.uContacts';
-import searchContacts from '@salesforce/apex/contactmanagementsystemcontroller.sContacts';
 
 export default class contactManagementSystem extends LightningElement {
     contact = {
@@ -16,6 +15,7 @@ export default class contactManagementSystem extends LightningElement {
     @track contacts = []; //stores list of fetched contacts
     selectedRows = [];
     @track draftValues = []; // tracks the updated values in the table
+    @track filteredContacts = [];
     firstName = '';
     lastName = '';
     email = '';
@@ -38,6 +38,7 @@ export default class contactManagementSystem extends LightningElement {
         fetchContacts(  )
             .then((result) => {
                 this.contacts = result;
+                this.filteredContacts = [...this.contacts];
             })
             .catch((error) => {
                 this.showToast('Error', 'We could not fetch the information about the Contacts', 'error');
@@ -73,7 +74,6 @@ export default class contactManagementSystem extends LightningElement {
                 this.showToast('Success', 'Contact created successfully', 'success');
             })
             .catch((error) => {
-                console.error('Contact not created: ', error);
                 this.showToast('Error', 'Contact could not be created successfully', 'error');
             })
             .finally(() => {
@@ -84,18 +84,12 @@ export default class contactManagementSystem extends LightningElement {
     //clearing all form fields
     clearForm() {
         this.template.querySelectorAll('lightning-input').forEach(input => (input.value = ''));
-        this.firstName = '';
-        this.lastName = '';
-        this.email = '';
-        this.phone = '';
     }   
     
     handleRowSelection(event) {
         try {
             const selectedRows = event.detail.selectedRows;
-            console.log('Selected Rows:', selectedRows);
             this.selectedRows = selectedRows ? selectedRows.map(row => row.Id) : [];
-            console.log('Selected Row IDs:', this.selectedRows);
         } catch (error) {
             console.error('Error in handleRowSelection:', error);
         }
@@ -116,13 +110,13 @@ export default class contactManagementSystem extends LightningElement {
         
         deleteContacts({ contactIds: this.selectedRows })
             .then(() => {
-                this.contacts = this.contacts.filter(contact => !contactIds.includes(contact.Id));
+                this.contacts = this.contacts.filter(contact => !this.selectedRows.includes(contact.Id));
+                this.filteredContacts = this.filteredContacts.filter((contact) => !this.selectedRows.includes(contact.Id));
                 this.selectedRows = [];
                 this.showToast('Success', 'Contact deleted successfully', 'success');
                 this.handleFetchContacts();
             })
             .catch((error) => {
-                console.error('Error al eliminar contacto: ', error);
                 this.showToast('Error', 'Contact could not be deleted successfully', 'error');
             })
             .finally(() => {
@@ -155,7 +149,6 @@ export default class contactManagementSystem extends LightningElement {
                 this.handleFetchContacts();
             })
             .catch((error) => {
-                console.error('Contact/s not updated: ', error);
                 this.showToast('Error', 'Contact/s could not be updated successfully', 'error');
             })
             .finally(() => {
@@ -163,28 +156,18 @@ export default class contactManagementSystem extends LightningElement {
             });
     }
 
-    handleSearchContacts(event) {
-        this.searchKey = event.target.value; 
-        console.log('Search key updated to: ', this.searchKey);
+    handleSearchContactList(event) {
+        this.searchKey = event.target.value.toLowerCase(); 
+        if (this.searchKey.length > 1) {
+            this.filteredContacts = this.contacts.filter(
+                (contact) =>
+                    (contact.FirstName__c && contact.FirstName__c.toLowerCase().startsWith(this.searchKey)) ||
+                    (contact.LastName__c && contact.LastName__c.toLowerCase().startsWith(this.searchKey))
+            );
+        } else {
+            this.filteredContacts = [...this.contacts];
+        }
     }
-
-    fetchSearchResults() {
-        this.isLoading = true;
-        console.log('Starting fetchSearchResults with searchKey: ', this.searchKey);
-        searchContacts({ searchKey: this.searchKey })
-            .then(result => {
-                this.contacts = result;
-                console.log('Fetched contacts: ', result);
-            })
-            .catch(error => {
-                console.error('Error in fetching contacts: ', error);
-                this.showToast('Error', 'No records found', 'error');
-            })
-            .finally(() => {
-                this.isLoading = false;
-            });
-    }
-    
 
     showToast(title, message, variant) {
         const event = new ShowToastEvent({

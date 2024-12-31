@@ -14,9 +14,7 @@
             </lightning-button>
         </div>
         <br>
-        <lightning-input label="Search by Contact's Name" value={searchKey} onchange={handleSearchContactList}></lightning-input>
-        <br>
-        <lightning-button label="Search" onclick={fetchSearchResults}></lightning-button>
+        <lightning-input label="Search by Contact's First and Last Name" value={searchKey} onchange={handleSearchContactList} placeholder="Please write 2 or more characters"></lightning-input>
         <br>
         <template if:true={isLoading}>
             <lightning-spinner alternative-tet="Loading"></lightning-spinner>
@@ -25,7 +23,7 @@
             <br>
             <lightning-datatable 
                 key-field="Id"
-                data={contacts}
+                data={filteredContacts}
                 columns={columns}
                 selected-rows={selectedRows}
                 onrowselection={handleRowSelection}
