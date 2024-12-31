@@ -4,7 +4,10 @@
             <lightning-input name="firstName" label="First Name" type="text" value={firstName} onchange={handleInputChange} lwc:ref="textArea"></lightning-input>
             <lightning-input name="lastName" label="Last Name" type="text" value={lastName} onchange={handleInputChange} lwc:ref="textArea"></lightning-input>
             <lightning-input name="email" label="Email" type="email" required value={email} onchange={handleInputChange} lwc:ref="textArea"></lightning-input>
-            <lightning-input name="phone" label="Phone" type="phone" value={phone} onchange={handleInputChange} lwc:ref="textArea"></lightning-input>
+            <lightning-input name="phone" label="Phone" type="tel" value={phone} onchange={handleInputChange} lwc:ref="textArea"></lightning-input>
+            <template if:true={phoneError}>
+                <div class="slds-text-color_error">{phoneError}</div>
+            </template>
         </div> 
         <div class="button-container">
             <lightning-button 
