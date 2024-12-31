@@ -43,4 +43,4 @@ public with sharing class contactmanagementsystemcontroller {
             throw new AuraHandledException('Error retrieving Contact/s ' + e.getMessage());
         }
     }
-}
+} 

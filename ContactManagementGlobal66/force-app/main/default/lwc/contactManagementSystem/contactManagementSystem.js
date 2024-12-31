@@ -164,7 +164,7 @@ export default class contactManagementSystem extends LightningElement {
                     (contact.FirstName__c && contact.FirstName__c.toLowerCase().startsWith(this.searchKey)) ||
                     (contact.LastName__c && contact.LastName__c.toLowerCase().startsWith(this.searchKey))
             );
-        } else {
+        } else { 
             this.filteredContacts = [...this.contacts];
         }
     }

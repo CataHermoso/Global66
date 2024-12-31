@@ -84,4 +84,4 @@ public class contactmanagementsystemcontroller_Test {
 
         System.assert(retrievedContacts.size() > 0, 'Contacts should have been retrieved');
     }
-}
+} 
