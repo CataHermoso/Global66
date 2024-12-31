@@ -81,8 +81,13 @@ export default class contactManagementSystem extends LightningElement {
             });
     }
 
-    //clearing all form fields
+    //clearing all fields
     clearForm() {
+        this.firstName = '';
+        this.lastName = '';
+        this.email = '';
+        this.phone = '';
+        this.searchKey = '';
         this.template.querySelectorAll('lightning-input').forEach(input => (input.value = ''));
     }   
     
